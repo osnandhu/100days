@@ -30,14 +30,23 @@ from typing import Type
 
 import numpy as np
 import pandas as pd
-from crewai import Agent, Task
-from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
 from scipy import stats
 from sklearn.ensemble import IsolationForest
 
 # Add parent paths so we can import project modules
 sys.path.insert(0, ".")
+
+# CrewAI imports are deferred — tools work standalone for testing/demos.
+# Only needed when running as part of a Crew.
+try:
+    from crewai import Agent, Task
+    from crewai.tools import BaseTool
+
+    CREWAI_AVAILABLE = True
+except ImportError:
+    CREWAI_AVAILABLE = False
+    BaseTool = object  # Fallback so class definitions still work
 from database import get_db_session
 from models import Transaction
 
@@ -267,7 +276,9 @@ def _z_score_severity(z: float) -> str:
 # ---------------------------------------------------------------------------
 
 
-def create_spending_agent(llm) -> Agent:
+def create_spending_agent(llm):
+    if not CREWAI_AVAILABLE:
+        raise ImportError("crewai is required to create agents. pip install crewai")
     return Agent(
         role="Spending Anomaly Detection Specialist",
         goal=(
@@ -287,7 +298,9 @@ def create_spending_agent(llm) -> Agent:
     )
 
 
-def create_spending_task(agent: Agent, user_id: int, context: str = "") -> Task:
+def create_spending_task(agent, user_id: int, context: str = ""):
+    if not CREWAI_AVAILABLE:
+        raise ImportError("crewai is required to create tasks. pip install crewai")
     return Task(
         description=(
             f"Fetch the last 3 months of transactions for user {user_id} from the "

@@ -35,7 +35,11 @@ import logging
 import os
 from typing import Optional
 
-from crewai import Crew, LLM, Process
+try:
+    from crewai import Crew, LLM, Process
+    CREWAI_AVAILABLE = True
+except ImportError:
+    CREWAI_AVAILABLE = False
 
 from services.agents.inflation_agent import create_inflation_agent, create_inflation_task
 from services.agents.orchestrator import (

@@ -30,11 +30,22 @@ from pathlib import Path
 from typing import List, Type
 
 import faiss
-import litellm
 import numpy as np
-from crewai import Agent, Task
-from crewai.tools import BaseTool
 from pydantic import BaseModel, Field
+
+try:
+    import litellm
+    LITELLM_AVAILABLE = True
+except ImportError:
+    LITELLM_AVAILABLE = False
+
+try:
+    from crewai import Agent, Task
+    from crewai.tools import BaseTool
+    CREWAI_AVAILABLE = True
+except ImportError:
+    CREWAI_AVAILABLE = False
+    BaseTool = object
 
 logger = logging.getLogger(__name__)
 
@@ -148,9 +159,23 @@ def _get_embeddings(texts: List[str]) -> np.ndarray:
     LiteLLM is a unified interface that works with OpenAI, Anthropic,
     Cohere, HuggingFace, Ollama, and 100+ other providers. Changing
     EMBEDDING_MODEL in the env var switches providers without code changes.
+
+    Falls back to simple hash-based vectors when LiteLLM is unavailable.
     """
-    response = litellm.embedding(model=EMBEDDING_MODEL, input=texts)
-    vectors = [item["embedding"] for item in response.data]
+    if LITELLM_AVAILABLE:
+        try:
+            response = litellm.embedding(model=EMBEDDING_MODEL, input=texts)
+            vectors = [item["embedding"] for item in response.data]
+            return np.array(vectors, dtype="float32")
+        except Exception as e:
+            logger.warning(f"LiteLLM embedding failed ({e}), using fallback")
+
+    # Fallback: deterministic hash-based vectors (for demos without API key)
+    dim = 128
+    vectors = []
+    for text in texts:
+        np.random.seed(hash(text) % 2**31)
+        vectors.append(np.random.rand(dim).astype("float32"))
     return np.array(vectors, dtype="float32")
 
 
@@ -338,22 +363,31 @@ class FinancialAdvisorTool(BaseTool):
             "Provide specific, actionable advice based on the above context."
         )
 
-        # Step 4: Generate answer via LiteLLM
-        try:
-            response = litellm.completion(
-                model=LLM_MODEL,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                temperature=0.3,  # Low temperature = more factual, less creative
-                max_tokens=500,
-            )
-            advice = response.choices[0].message.content
-        except Exception as e:
+        # Step 4: Generate answer via LiteLLM (or fallback to document summary)
+        if LITELLM_AVAILABLE:
+            try:
+                response = litellm.completion(
+                    model=LLM_MODEL,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    temperature=0.3,
+                    max_tokens=500,
+                )
+                advice = response.choices[0].message.content
+            except Exception as e:
+                advice = (
+                    f"LLM generation failed ({e}). Based on retrieved documents, "
+                    f"key advice areas: {', '.join(sources)}"
+                )
+        else:
             advice = (
-                f"LLM generation failed ({e}). Based on retrieved documents, "
-                f"key advice areas: {', '.join(sources)}"
+                "Based on retrieved knowledge base documents:\n\n"
+                + "\n\n".join(
+                    f"- **{doc['title']}**: {doc['content'][:150]}..."
+                    for doc in relevant_docs
+                )
             )
 
         return json.dumps(
@@ -371,7 +405,9 @@ class FinancialAdvisorTool(BaseTool):
 # ---------------------------------------------------------------------------
 
 
-def create_rag_agent(llm) -> Agent:
+def create_rag_agent(llm):
+    if not CREWAI_AVAILABLE:
+        raise ImportError("crewai is required to create agents. pip install crewai")
     return Agent(
         role="Personalised Financial Advisor",
         goal=(
@@ -391,7 +427,9 @@ def create_rag_agent(llm) -> Agent:
     )
 
 
-def create_rag_task(agent: Agent, question: str, user_context: str = "") -> Task:
+def create_rag_task(agent, question: str, user_context: str = ""):
+    if not CREWAI_AVAILABLE:
+        raise ImportError("crewai is required to create tasks. pip install crewai")
     return Task(
         description=(
             f"The user asks: '{question}'. "

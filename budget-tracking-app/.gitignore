@@ -1,0 +1,4 @@
+budget.db
+*.pyc
+__pycache__/
+data/faiss_index.bin
