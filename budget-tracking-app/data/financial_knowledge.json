@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "The 50/30/20 Budget Rule",
+    "content": "Allocate 50% of after-tax income to needs (rent, utilities, groceries, insurance), 30% to wants (dining out, entertainment, hobbies), and 20% to savings and debt repayment. This is a simple framework that works for most income levels. If you live in an expensive city like Singapore, the needs portion might stretch to 60%, which means cutting wants to 20%.",
+    "category": "budgeting"
+  },
+  {
+    "id": 2,
+    "title": "Emergency Fund Basics",
+    "content": "An emergency fund should cover 3-6 months of essential expenses. Keep it in a high-yield savings account for easy access. Start small: even $500 covers most minor emergencies like a phone repair or urgent clinic visit. Build it before investing in stocks or crypto. In Singapore, aim for at least $10,000-$15,000 as a baseline.",
+    "category": "savings"
+  },
+  {
+    "id": 3,
+    "title": "Managing Lifestyle Inflation",
+    "content": "When your income rises, resist the urge to increase spending proportionally. If you get a $500/month raise, save at least half of it. Lifestyle inflation is the number one reason high earners still live paycheck to paycheck. Track your spending before and after a raise to catch creeping expenses.",
+    "category": "budgeting"
+  },
+  {
+    "id": 4,
+    "title": "Inflation Impact on Savings",
+    "content": "If inflation is 4% and your savings account earns 2%, your money loses 2% purchasing power per year. Combat this by: 1) Using high-yield savings accounts (Singapore banks offer 3-4% with conditions), 2) Investing in inflation-protected securities, 3) Diversifying into assets that historically beat inflation like equities and real estate. Even small inflation erodes cash savings over decades.",
+    "category": "inflation"
+  },
+  {
+    "id": 5,
+    "title": "Grocery Spending Optimisation",
+    "content": "Groceries are often the most flexible budget category. Strategies: 1) Meal plan weekly to avoid impulse buys, 2) Buy store brands which are 30-50% cheaper, 3) Use cashback apps and loyalty cards, 4) Shop seasonal produce from wet markets, 5) Buy in bulk for non-perishables at warehouses. Target: keep groceries under 10-15% of take-home pay. In Singapore, NTUC FairPrice has consistent promotions worth tracking.",
+    "category": "spending"
+  },
+  {
+    "id": 6,
+    "title": "Debt Avalanche vs Snowball Method",
+    "content": "Avalanche: pay minimums on all debts, put extra toward the highest interest rate debt first. Saves the most money mathematically. Snowball: pay off smallest balance first for quick psychological wins. Better for motivation. Pick avalanche if you are disciplined, snowball if you need momentum. Never pay only minimums on credit cards as interest compounds rapidly.",
+    "category": "debt"
+  },
+  {
+    "id": 7,
+    "title": "Singapore CPF Optimisation",
+    "content": "CPF (Central Provident Fund) is Singapore's social security system. Maximise it by: 1) Voluntary contributions for tax relief up to $8,000 per year to MediSave and Special Account, 2) Transfer Ordinary Account to Special Account for higher interest (4% vs 2.5%), 3) Use CPF Investment Scheme for potentially higher returns on amounts above $20,000 in OA. Do not touch it unless buying a home or for serious medical needs.",
+    "category": "savings"
+  },
+  {
+    "id": 8,
+    "title": "Subscription Audit Strategy",
+    "content": "The average person spends $200 or more per month on subscriptions they barely use. Monthly audit: 1) List every recurring charge from bank statements, 2) Rate each 1-5 on actual usage, 3) Cancel anything below 3, 4) Downgrade premium tiers to basic where possible. Set a calendar reminder to audit quarterly. Common culprits: streaming services, gym memberships, cloud storage, and app subscriptions.",
+    "category": "spending"
+  },
+  {
+    "id": 9,
+    "title": "Investing During High Inflation",
+    "content": "During high inflation: 1) Avoid holding excess cash beyond your emergency fund, 2) Consider Treasury Inflation-Protected Securities (TIPS) or Singapore Savings Bonds, 3) REITs can hedge against inflation via rising rents, 4) Commodities often rise with inflation, 5) Keep investing regularly via dollar-cost averaging regardless of inflation level. Do not try to time the market as even professionals fail at this consistently.",
+    "category": "inflation"
+  },
+  {
+    "id": 10,
+    "title": "Building a Side Income",
+    "content": "If cutting expenses is not enough, increase income: 1) Freelance your professional skills which has the highest ROI, 2) Sell unused items on Carousell, 3) Tutoring or teaching, 4) Part-time consulting. Even $500 per month extra directed entirely to savings compounds significantly over 5-10 years. In Singapore, ensure side income complies with your employment contract terms.",
+    "category": "income"
+  }
+]
