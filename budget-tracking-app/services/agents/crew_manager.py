@@ -55,6 +55,64 @@ from services.agents.spending_agent import create_spending_agent, create_spendin
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------------
+# Langfuse Observability
+# ---------------------------------------------------------------------------
+# Langfuse traces every LLM call, tool invocation, and agent step.
+# Set these env vars to enable:
+#   LANGFUSE_PUBLIC_KEY=pk-lf-...
+#   LANGFUSE_SECRET_KEY=sk-lf-...
+#   LANGFUSE_HOST=https://cloud.langfuse.com  (or self-hosted URL)
+#
+# HOW IT WORKS:
+#   LiteLLM has a native Langfuse callback. When enabled, every call
+#   to litellm.completion() or litellm.embedding() automatically sends
+#   a trace to Langfuse — no code changes in the agent files needed.
+#   CrewAI uses LiteLLM under the hood, so all agent LLM calls are
+#   captured automatically.
+#
+# WHAT YOU SEE IN THE LANGFUSE DASHBOARD:
+#   - Each user query → a "trace" with a unique ID
+#   - Each agent's LLM call → a "generation" (input, output, tokens, latency)
+#   - Each tool call → a "span" showing what the agent invoked
+#   - Cost tracking per query (which agent costs the most?)
+#   - Latency breakdown (which tool is the bottleneck?)
+# ---------------------------------------------------------------------------
+
+LANGFUSE_ENABLED = False
+
+
+def _init_langfuse():
+    """
+    Initialize Langfuse tracing via LiteLLM callbacks.
+
+    This is the zero-code-change approach: we tell LiteLLM to send
+    telemetry to Langfuse, and since CrewAI uses LiteLLM internally,
+    all agent calls are traced automatically.
+    """
+    global LANGFUSE_ENABLED
+
+    public_key = os.getenv("LANGFUSE_PUBLIC_KEY", "")
+    secret_key = os.getenv("LANGFUSE_SECRET_KEY", "")
+    host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
+
+    if not public_key or not secret_key:
+        logger.info("Langfuse not configured (set LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY)")
+        return
+
+    try:
+        import litellm
+        litellm.success_callback = ["langfuse"]
+        litellm.failure_callback = ["langfuse"]
+
+        os.environ.setdefault("LANGFUSE_HOST", host)
+
+        LANGFUSE_ENABLED = True
+        logger.info(f"Langfuse tracing enabled → {host}")
+    except ImportError:
+        logger.warning("litellm not installed, Langfuse tracing disabled")
+
+
 def _get_llm() -> LLM:
     """
     Create a CrewAI LLM instance using LiteLLM under the hood.
@@ -221,8 +279,10 @@ def run_full_analysis(
 def initialize() -> None:
     """
     Call once at application startup.
-    Pre-builds the FAISS index so first queries don't have cold-start lag.
+    Sets up Langfuse tracing and pre-builds the FAISS index.
     """
+    _init_langfuse()
+
     try:
         initialize_knowledge_base()
         logger.info("Knowledge base initialised successfully")
