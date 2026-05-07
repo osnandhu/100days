@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey, func
+from sqlalchemy import Column, Float, Integer, String, Numeric, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -67,3 +67,47 @@ class CategoryPattern(Base):
     created_at = Column(DateTime, default=func.now())
 
     user = relationship("User", back_populates="category_patterns")
+
+
+class InflationForecast(Base):
+    """
+    Stores inflation forecast results so we can:
+    - Track predictions over time (were we accurate?)
+    - Show historical forecasts in the dashboard
+    - Avoid re-running expensive Prophet fits for the same data
+    """
+    __tablename__ = "inflation_forecasts"
+
+    id = Column(Integer, primary_key=True)
+    forecast_date = Column(String(7), nullable=False)  # "2025-07"
+    predicted_inflation = Column(Float, nullable=False)
+    lower_bound = Column(Float, nullable=False)
+    upper_bound = Column(Float, nullable=False)
+    confidence_level = Column(String(50), default="95%")
+    data_source = Column(String(100))
+    model_used = Column(String(50), default="prophet")
+    created_at = Column(DateTime, default=func.now())
+
+    def __repr__(self):
+        return f"<Forecast {self.forecast_date}: {self.predicted_inflation:.2f}%>"
+
+
+class SpendingAnomaly(Base):
+    """
+    Persists detected anomalies so we can:
+    - Track whether flagged anomalies were real (user feedback)
+    - Build a history of anomaly patterns
+    - Show anomaly trends on a dashboard
+    """
+    __tablename__ = "spending_anomalies"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    transaction_id = Column(Integer, ForeignKey("transactions.id"), nullable=False)
+    severity = Column(String(10), nullable=False)  # LOW/MEDIUM/HIGH/CRITICAL
+    detection_method = Column(String(30), nullable=False)
+    z_score = Column(Float, nullable=True)
+    created_at = Column(DateTime, default=func.now())
+
+    user = relationship("User")
+    transaction = relationship("Transaction")
