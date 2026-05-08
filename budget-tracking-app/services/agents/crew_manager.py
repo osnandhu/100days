@@ -126,8 +126,8 @@ def _get_llm() -> LLM:
       LLM_MODEL=anthropic/claude-sonnet-4-20250514  LLM_API_KEY=sk-ant-...
       LLM_MODEL=ollama/llama3           (no API key needed for local)
     """
-    model = os.getenv("LLM_MODEL", "openai/gpt-4o-mini")
-    api_key = os.getenv("LLM_API_KEY", "")
+    model = os.getenv("LLM_MODEL", "anthropic/claude-sonnet-4-20250514")
+    api_key = os.getenv("LLM_API_KEY", os.getenv("ANTHROPIC_API_KEY", ""))
 
     return LLM(model=model, api_key=api_key) if api_key else LLM(model=model)
 

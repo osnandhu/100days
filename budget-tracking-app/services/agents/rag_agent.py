@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ---------------------------------------------------------------------------
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-ada-002")
-LLM_MODEL = os.getenv("LLM_MODEL", "openai/gpt-4o-mini")
+LLM_MODEL = os.getenv("LLM_MODEL", "anthropic/claude-sonnet-4-20250514")
 KNOWLEDGE_BASE_PATH = Path(__file__).parent.parent.parent / "data" / "financial_knowledge.json"
 FAISS_INDEX_PATH = Path(__file__).parent.parent.parent / "data" / "faiss_index.bin"
 
