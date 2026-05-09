@@ -41,6 +41,9 @@ try:
 except ImportError:
     CREWAI_AVAILABLE = False
 
+import litellm
+litellm.drop_params = True
+
 from services.agents.inflation_agent import create_inflation_agent, create_inflation_task
 from services.agents.orchestrator import (
     AgentResult,
