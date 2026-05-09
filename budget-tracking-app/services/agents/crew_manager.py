@@ -129,7 +129,13 @@ def _get_llm() -> LLM:
     model = os.getenv("LLM_MODEL", "anthropic/claude-sonnet-4-20250514")
     api_key = os.getenv("LLM_API_KEY", os.getenv("ANTHROPIC_API_KEY", ""))
 
-    return LLM(model=model, api_key=api_key) if api_key else LLM(model=model)
+    kwargs = {"model": model}
+    if api_key:
+        kwargs["api_key"] = api_key
+    if "anthropic" in model:
+        kwargs["supports_strict_tools"] = False
+
+    return LLM(**kwargs)
 
 
 # ---------------------------------------------------------------------------
